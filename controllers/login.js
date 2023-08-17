@@ -1,4 +1,5 @@
 const userDataTable = require('../models/user');
+const bcrypt = require('bcrypt');
 
 exports.loginpost = async (req, res, next) => {
     console.log("inside login post controller");
@@ -9,13 +10,17 @@ exports.loginpost = async (req, res, next) => {
                 console.log("User found in controller")
                 console.log(req.body.password);
                 console.log(user[0].password);
-                if(user[0].password === req.body.password){
-                    console.log("User password matched")
-                    return res.status(200).json({success:true,message:"user logged in successfully"});
-                }
-                else{
-                    return res.status(401).json({error:"incorrect password"});                   
-                }
+                bcrypt.compare(req.body.password, user[0].password,(err, result) => {
+                    if(err){
+                        throw new Error('something went wrong')
+                    }
+                    if(result === true){
+                        console.log("User password matched")
+                        res.status(200).json({success:true,message:"user logged in successfully"});
+                    }else{
+                        res.status(401).json({error:"incorrect password"});                   
+                    }
+                })
             }   
     }catch(err){
         console.log(err);
