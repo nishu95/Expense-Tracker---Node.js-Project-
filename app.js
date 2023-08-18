@@ -1,8 +1,9 @@
 const express = require('express');
 const app=express();
-const sequelize = require('./models/user');
+const sequelize = require('./util/database');
 const signupRoute = require('./routes/signup');
 const loginRoute = require('./routes/login');
+const expenseRoute = require('./routes/expense');
 const cors = require('cors')
 const bodyParser = require('body-parser');
 
@@ -11,6 +12,7 @@ app.use(bodyParser.urlencoded({extended:false}));
 app.use(bodyParser.json({extended:false}));
 app.use(signupRoute);
 app.use(loginRoute);
+app.use(expenseRoute);
 
 sequelize
     //.sync({force:true})

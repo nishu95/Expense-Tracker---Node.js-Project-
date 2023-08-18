@@ -18,7 +18,8 @@ async function login(e){
 
         console.log(response.status);
         if(response.status===200){
-            alert(response.data.message);
+            window.location.href = "../public/expense.html";
+            // alert(response.data.message);
         }else{
             alert(response.data.message);
             console.log(response.data.message);
