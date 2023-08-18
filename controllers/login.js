@@ -1,5 +1,10 @@
 const userDataTable = require('../models/user');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+
+function generateAccessToken(id,name){
+    return jwt.sign({userId:id,name:name},'3256esdr9879875621312fvbrgrhrfv31154evegtge1')
+}
 
 exports.loginpost = async (req, res, next) => {
     console.log("inside login post controller");
@@ -16,7 +21,7 @@ exports.loginpost = async (req, res, next) => {
                     }
                     if(result === true){
                         console.log("User password matched")
-                        res.status(200).json({success:true,message:"user logged in successfully"});
+                        res.status(200).json({success:true,message:"user logged in successfully", token:generateAccessToken(user[0].id,user[0].name)});
                     }else{
                         res.status(401).json({error:"incorrect password"});                   
                     }

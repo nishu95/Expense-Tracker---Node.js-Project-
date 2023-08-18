@@ -13,7 +13,6 @@ const expenseTable = sequelize.define('expenses',{
     },
     description:{
         type:Sequelize.STRING,
-        unique:true,
         allowNull:false
     },
     catagory:{

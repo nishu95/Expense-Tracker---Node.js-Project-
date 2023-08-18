@@ -2,6 +2,7 @@ const form = document.getElementById('form');
 form.addEventListener('submit', addexpense);
 const table = document.getElementById('table');
 table.addEventListener('click',change)
+const token = localStorage.getItem('token');
 
 async function addexpense(e){
     e.preventDefault();
@@ -13,7 +14,7 @@ async function addexpense(e){
     }
     console.log(object);
     try{
-        const newData = await axios.post('http://localhost:7300/expense',object);
+        const newData = await axios.post('http://localhost:7300/expense',object,{headers:{"Authorization":token}});
         addToTable(newData.data);
         form.reset();
     }catch(e){console.log(err)}
@@ -45,7 +46,7 @@ async function change(e){
     userId=tr.id;
     if(e.target.classList.contains('delete')){
         try{
-            await axios.delete(`http://localhost:7300/delete/${userId}`);
+            await axios.delete(`http://localhost:7300/delete/${userId}`,{headers:{"Authorization":token}});
             table.removeChild(tr);
             document.location.reload();
         }catch(err){console.log(err)}
@@ -53,10 +54,12 @@ async function change(e){
 }
 
 document.addEventListener('DOMContentLoaded',async ()=>{
+    
     try{
-        const oldDatalist = await axios.get('http://localhost:7300/expense');
-        for(let i=0;i<oldDatalist.data.length;i++){
-            addToTable(oldDatalist.data[i]);
+        const oldDatalist = await axios.get('http://localhost:7300/expense',{headers:{"Authorization":token}});
+        console.log("inside refresh",oldDatalist);
+        for(let i=0;i<oldDatalist.data.response.length;i++){
+            addToTable(oldDatalist.data.response[i]);
         }
     }
     catch(err){console.log(err);}
