@@ -19,7 +19,7 @@ exports.loginpost = async (req, res, next) => {
                     if(err){
                         throw new Error('something went wrong')
                     }
-                    if(result === true){
+                    if(result === true){      // for successful login we generate token
                         console.log("User password matched")
                         res.status(200).json({success:true,message:"user logged in successfully", token:generateAccessToken(user[0].id,user[0].name)});
                     }else{

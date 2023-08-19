@@ -3,10 +3,13 @@ const expenseDataTable = require('../models/expense');
 exports.expenseGet = async (req, res, next) => {
     console.log("inside get expense controller")
     try{
+        // console.log("user is >>>",req.user);
+        const ispremium= req.user.ispremiumuser;
+        // console.log("is user premuium? >>>",ispremium);
         // we can also use this
         // const response = await req.user.getExpenses();
         const response = await expenseDataTable.findAll({where: {userId: req.user.id}});
-        res.status(200).json({response,success:true});
+        res.status(200).json({response , success:true , premiumStatus: ispremium});
     }catch(err){
         console.log(err)
         res.status(500).json({success:false});

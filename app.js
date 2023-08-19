@@ -1,13 +1,17 @@
 const express = require('express');
 const app=express();
+
 const sequelize = require('./util/database');
 const signupRoute = require('./routes/signup');
 const loginRoute = require('./routes/login');
 const expenseRoute = require('./routes/expense');
+const purchaseRoute = require('./routes/purchase');
 const cors = require('cors')
 const bodyParser = require('body-parser');
+
 const User = require('./models/user');
 const Expense = require('./models/expense');
+const Order = require('./models/order');
 
 app.use(cors());
 app.use(bodyParser.urlencoded({extended:false}));
@@ -15,9 +19,15 @@ app.use(bodyParser.json({extended:false}));
 app.use(signupRoute);
 app.use(loginRoute);
 app.use(expenseRoute);
+app.use(purchaseRoute);
 
 User.hasMany(Expense);
 Expense.belongsTo(User);
+
+User.hasMany(Order);
+Order.belongsTo(User);
+
+
 
 sequelize
     //.sync({force:true})

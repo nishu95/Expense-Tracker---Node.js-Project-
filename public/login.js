@@ -21,7 +21,7 @@ async function login(e){
             
             alert(response.data.message);
             console.log(response.data);
-            localStorage.setItem("token",response.data.token);
+            localStorage.setItem("token",response.data.token);    // we save the generated token in controller in local storage to be used later
             window.location.href = "../public/expense.html";
 
         }else{

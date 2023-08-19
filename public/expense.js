@@ -58,6 +58,10 @@ document.addEventListener('DOMContentLoaded',async ()=>{
     try{
         const oldDatalist = await axios.get('http://localhost:7300/expense',{headers:{"Authorization":token}});
         console.log("inside refresh",oldDatalist);
+        if(oldDatalist.data.premiumStatus){
+            document.getElementById("rzp-button1").style.visibility = "hidden";
+            document.getElementById("message").removeAttribute("hidden");
+        }
         for(let i=0;i<oldDatalist.data.response.length;i++){
             addToTable(oldDatalist.data.response[i]);
         }
@@ -65,3 +69,36 @@ document.addEventListener('DOMContentLoaded',async ()=>{
     catch(err){console.log(err);}
     
 });
+
+document.getElementById("rzp-button1").onclick = async function(e){
+    
+    const response = await axios.get('http://localhost:7300/premiumMembership',{headers:{"Authorization":token}});
+    console.log("rzp button clicked and get reponse is ->>>",response);
+
+    var options = {
+        "key":response.data.key_id,  // enter the key ID generated from the dashboard
+        "order_id":response.data.order.id, // for one time payment
+        // this handler function will handle the success payment
+        "handler": async function(response){
+            await axios.post('http://localhost:7300/updatetransactionstatus',{
+                order_id: options.order_id,
+                payment_id: response.razorpay_payment_id,
+            },{headers:{"Authorization":token}});
+
+            alert("you are a premium user now")
+            document.getElementById("rzp-button1").style.visibility = "hidden";
+            document.getElementById("message").removeAttribute("hidden");
+        },
+    };
+
+    const rzp1 = new Razorpay(options);
+    rzp1.open();
+    e.preventDefault();
+
+    rzp1.on('payment.failed',async function(response){
+        console.log(response);
+        alert('something went wrong with the payment')
+    })
+    
+}
+
