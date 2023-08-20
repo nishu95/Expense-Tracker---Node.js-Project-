@@ -1,4 +1,5 @@
 const expenseDataTable = require('../models/expense');
+const UserDataTable=require('../models/user');
 
 exports.expenseGet = async (req, res, next) => {
     console.log("inside get expense controller")
@@ -27,11 +28,31 @@ exports.expensePost = async(req, res, next) => {
     
     try{
         // req.user.createExpense({expense,description,catagory})
-        const newExpense = await expenseDataTable.create({expense,description,catagory,userId});
-        res.status(200).json(newExpense);
+        expenseDataTable.create({expense,description,catagory,userId})
+            .then(expenseData=>{
+                console.log("new expense", expense);
+                console.log("total expense of user before is :",req.user.totalExpense);
+                const newtotalExpOfUser = Number(req.user.totalExpense) + Number(expense);
+                console.log("new total expense of user after is :",newtotalExpOfUser);
+                UserDataTable.update({totalExpense:newtotalExpOfUser},{where:{id:req.user.id}})
+                    .then(()=>{
+                        res.status(200).json(expenseData);
+                    })
+                    .catch((err) => {
+                        console.log("1",err);
+                        return res.status(500).json({success:false,error:err});
+                    })
+
+            })
+            .catch((err) => {
+                console.log("2",err);
+                return res.status(500).json({success:false,error:err});
+            })
+
+        
 
     }catch(err){
-        console.log(err);
+        console.log("3 posting data not working",err);
         res.status(500).json({success: false});
     }
 }
