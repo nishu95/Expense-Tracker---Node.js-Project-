@@ -55,19 +55,35 @@
                 <div class="col align-items-center">
                     <input type="text" name="message" id="message" value="you are a premium user" style="width: 190px; background-color: orange" readonly hidden>
                 </div>
+                <div class="col align-items-center">
+                    <button name="leaderboard" id="leaderboard" style="width: 190px; background-color: silver" hidden>Leaderboard</button>
+                </div>
             </div>
         </div>
     </div>
-    <table class="table" id="table">
-        <tr>
-            <td>Expense</td>
-            <td>Description</td>
-            <td>Category</td>
-            <td>Delete</td>
-        </tr>   
-    </table>
+    <div class="container">
+        <h2>EXPENSE</h2>
+        <table class="table" id="table">
+            <tr>
+                <td>Expense</td>
+                <td>Description</td>
+                <td>Category</td>
+                <td>Delete</td>
+            </tr>   
+        </table>
+    </div>
     
-    
+    <div class="container" id="leader" > 
+        <p id="p" hidden><strong>Leader Board</strong></p>     
+        <table class="table" id="leaderboardtable" hidden>
+            <tr>
+                <td>Name Of User</td>
+                <td>Total Expense (in INR)</td>
+            </tr> 
+             
+        </table>
+    </div>
+  
     <script src="./expense.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.1.3/axios.min.js"></script>
 </body>

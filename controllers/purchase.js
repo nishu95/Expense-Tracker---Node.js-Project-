@@ -32,14 +32,23 @@ const purchasepremium = async (req,res) => {
 
 const updateTransactionStatus = async (req, res) => {
     try{
-        const {payment_id,order_id} = req.body;
-        const order = await Order.findOne({where:{orderid: order_id}})
-        const promise1 = order.update({paymentid:payment_id,status:"SUCCESSFUL"});
-        const promise2 = req.user.update({ispremiumuser: true});
+        if(req.body.clickStatus === "payment_success"){
+            const {payment_id,order_id} = req.body;
+            const order = await Order.findOne({where:{orderid: order_id}})
+            const promise1 = order.update({paymentid:payment_id,status:"SUCCESSFUL"});
+            const promise2 = req.user.update({ispremiumuser: true});
 
-        Promise.all([promise1, promise2]).then(()=>{
-            res.status(202).json({success:true,message:"transaction successful"});
-        }).catch(err => {throw new Error(err);})
+            Promise.all([promise1, promise2]).then(()=>{
+                res.status(202).json({success:true,message:"transaction successful"});
+            }).catch(err => {throw new Error(err);})
+        }
+        if(req.body.clickStatus === 'payment_failed'){
+            const {payment_id,order_id} = req.body;
+            const order = await Order.findOne({where:{orderid: order_id}})
+            const promise1 = order.update({paymentid:payment_id,status:"FAILED"});
+            res.status(200).json({success:false, message:"transaction failed"});
+        }
+        
         
     }catch(err){
         console.log(err);
