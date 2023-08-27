@@ -7,6 +7,8 @@ const loginRoute = require('./routes/login');
 const expenseRoute = require('./routes/expense');
 const purchaseRoute = require('./routes/purchase');
 const premiumRoute = require('./routes/premium');
+const forgetPasswordRoute = require('./routes/forgetpassword');
+
 const cors = require('cors')
 const bodyParser = require('body-parser');
 
@@ -22,6 +24,7 @@ app.use(loginRoute);
 app.use(expenseRoute);
 app.use(purchaseRoute);
 app.use(premiumRoute);
+app.use(forgetPasswordRoute);
 
 User.hasMany(Expense);
 Expense.belongsTo(User);

@@ -32,6 +32,7 @@ const purchasepremium = async (req,res) => {
 
 const updateTransactionStatus = async (req, res) => {
     try{
+        
         if(req.body.clickStatus === "payment_success"){
             const {payment_id,order_id} = req.body;
             const order = await Order.findOne({where:{orderid: order_id}})

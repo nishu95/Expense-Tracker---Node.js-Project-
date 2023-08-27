@@ -1,12 +1,14 @@
 const userDataTable = require('../models/user');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const sequelize = require('../util/database')
 
 function generateAccessToken(id,name){
     return jwt.sign({userId:id,name:name},'3256esdr9879875621312fvbrgrhrfv31154evegtge1')
 }
 
 exports.loginpost = async (req, res, next) => {
+    
     console.log("inside login post controller");
     console.log(req.body.email);
     try{

@@ -1,5 +1,6 @@
 const expenseDataTable = require('../models/expense');
 const UserDataTable=require('../models/user');
+const sequelize = require('../util/database');
 
 exports.expenseGet = async (req, res, next) => {
     console.log("inside get expense controller")
@@ -18,33 +19,41 @@ exports.expenseGet = async (req, res, next) => {
 }
 
 exports.expensePost = async(req, res, next) => {
+    const t = await sequelize.transaction();
     console.log("inside post expense controller");
     console.log({...req.body});
-    
+
     const expense=req.body.expense;
     const description=req.body.description;
     const catagory=req.body.catagory;
     const userId=req.user.id; 
+
+    if(expense == undefined || expense.length === 0){
+        res.status(400).json({success: false,message:'Parameter Missing'});
+    }
     
     try{
         // req.user.createExpense({expense,description,catagory})
-        expenseDataTable.create({expense,description,catagory,userId})
+        expenseDataTable.create({expense,description,catagory,userId},{transaction: t})
             .then(expenseData=>{
                 console.log("new expense", expense);
                 console.log("total expense of user before is :",req.user.totalExpense);
                 const newtotalExpOfUser = Number(req.user.totalExpense) + Number(expense);
                 console.log("new total expense of user after is :",newtotalExpOfUser);
-                UserDataTable.update({totalExpense:newtotalExpOfUser},{where:{id:req.user.id}})
-                    .then(()=>{
+                UserDataTable.update({totalExpense:newtotalExpOfUser},{where:{id:req.user.id}, transaction: t})
+                    .then(async ()=>{
+                        await t.commit();
                         res.status(200).json(expenseData);
                     })
-                    .catch((err) => {
+                    .catch(async (err) => {
+                        await t.rollback();
                         console.log("1",err);
                         return res.status(500).json({success:false,error:err});
                     })
 
             })
-            .catch((err) => {
+            .catch(async (err) => {
+                await t.rollback();
                 console.log("2",err);
                 return res.status(500).json({success:false,error:err});
             })
@@ -58,13 +67,17 @@ exports.expensePost = async(req, res, next) => {
 }
 
 exports.expenseDelete = async (req,res,next) => {
+    const t = await sequelize.transaction();
     console.log("inside delete controller");
     const expenseId = req.params.id;
     try{
-        await expenseDataTable.destroy({where: {id: expenseId,userId: req.user.id}})
-        .then(()=>{
+        await expenseDataTable.destroy({where: {id: expenseId,userId: req.user.id},transaction:t})
+        .then(async ()=>{
+            t.commit();
             res.sendStatus(200);
-        }).catch(err => {throw new Error(err)})
+        }).catch(async(err) => {
+            t.rollback();
+            throw new Error(err)})
         
          
     }catch(err){
