@@ -1,4 +1,5 @@
-document.getElementById("form").addEventListener("submit",forget);
+const form=document.getElementById("form")
+form.addEventListener("submit",forget);
 
 async function forget(e){
     e.preventDefault();
@@ -9,6 +10,7 @@ async function forget(e){
     try{
         await axios.post('http://localhost:7300/password/forgotpassword',email)
             .then(()=>{
+                form.reset();
                 console.log('forget password successfull');;
             })
             .catch(err => console.log(err));
