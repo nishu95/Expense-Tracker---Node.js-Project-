@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker</title>
+    <link rel="stylesheet" href="expense.css">
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
+      crossorigin="anonymous"
+    ></script>
+</head>
+<body>
+    <div class="card">
+        <div class="card-body">
+            <div class="container text-center">
+                <form action="" id="form">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <label for="expense">Expense</label>
+                            <input type="text" id="expense" name="expense" placeholder="please enter expense" required>
+                        </div>
+                        <div class="col">
+                            <label for="description">Description</label>
+                            <input type="text" id="description" name="description" placeholder="please enter email" required>
+                        </div>
+                        <div class="col">
+                            <label for="category">Category:</label>
+                            <select id="category" name="category" required placeholder="choose a category" required>
+                                <option value="">CHOOSE</option>
+                                <option value="food">Food</option>
+                                <option value="transport">Transport</option>
+                                <option value="entertainment">Entertainment</option>
+                                <option value="shopping">Shopping</option>
+                                <option value="others">Others</option>
+                            </select>
+                        </div>
+                        <div class="col">
+                            <button type="submit" class="btn btn-success">Add Expense</button>
+                        </div>
+                        
+                    </div>
+                </form>
+                <div class="col align-items-center">
+                    <button type="button" id="rzp-button1" class="btn btn-success">BUY PREMIUM</button>
+                    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+                </div>
+                <div class="col align-items-center">
+                    <input type="text" name="message" id="message" value="you are a premium user" style="width: 190px; background-color: orange" readonly hidden>
+                </div>
+                <div class="col align-items-center">
+                    <button name="leaderboard" id="leaderboard" style="width: 190px; background-color: rgb(93, 199, 238)" hidden>Leaderboard</button>
+                </div>
+                <br>
+                <div class="col align-items-center">
+                    <button name="downloadreport" id="downloadreport" style="width: 250px; background-color: rgb(10, 216, 61)" hidden>Download Expense Report</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <h2>EXPENSE</h2>
+        <table class="table" id="table">
+            <tr>
+                <td>Expense</td>
+                <td>Description</td>
+                <td>Category</td>
+                <td>Delete</td>
+            </tr>   
+        </table>
+    </div>
+    
+    <div class="container" id="leader" > 
+        <p id="p" hidden><strong>Leader Board</strong></p>     
+        <table class="table" id="leaderboardtable" hidden>
+            <tr>
+                <td>Name Of User</td>
+                <td>Total Expense (in INR)</td>
+            </tr> 
+             
+        </table>
+    </div>
+  
+    <script src="./expense.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.1.3/axios.min.js"></script>
+</body>
+</html>
