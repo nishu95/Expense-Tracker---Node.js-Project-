@@ -1,6 +1,9 @@
 const expenseDataTable = require('../models/expense');
 const userDataTable = require('../models/user');
 const sequelize = require('../util/database');
+const UserServices = require('../services/userservices');
+const S3Services = require('../services/S3services');
+const download = require('../models/download');
 
 exports.showleaderboard = async (req, res, next) => {
     try{
@@ -25,4 +28,33 @@ exports.showleaderboard = async (req, res, next) => {
         console.log(err);
         res.status(500).json({success:false,message: err.message});
     }
+}
+
+
+
+
+exports.downloadExpenseReport = async (req,res,next) =>{
+    try{
+        console.log("inside downloadExpenseReport controller");
+        const expenses = await UserServices.getExpenses(req);      // sequelize method in services done indirectly
+        console.log(expenses);
+        const srtingifiedExpenses = JSON.stringify(expenses);
+        console.log(srtingifiedExpenses);
+
+        // depending on userid we will name our expense file to download 
+        const userId= req.user.id;
+        const filename = `Expense_${userId}/${new Date()}.txt`;
+
+        const fileURL = await S3Services.uploadToS3(srtingifiedExpenses,filename);
+
+        // adding file in downloadedfiles databases
+        await UserServices.createDownload(fileURL,req);
+
+        res.status(200).json({fileURL,success:true})
+
+    }catch(err){
+        console.log(err);
+        res.status(500).json({fileURL: '', success: false, err:err})
+    }
+    
 }

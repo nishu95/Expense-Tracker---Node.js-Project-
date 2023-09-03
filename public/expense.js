@@ -4,7 +4,11 @@ const table = document.getElementById('table');
 table.addEventListener('click',change)
 const leaderboardButton = document.getElementById('leaderboard');
 leaderboardButton.addEventListener('click',showLeaderboardTable);
+const download = document.getElementById('downloadreport');;
+download.addEventListener('click',DownloadReport)
 const token = localStorage.getItem('token');
+
+
 
 
 async function addexpense(e){
@@ -86,6 +90,31 @@ async function showLeaderboardTable(e){
 
 }
 
+async function DownloadReport(e){
+    e.preventDefault();
+    try{
+        await axios.get('http://localhost:7300/premium/downloadExpenseReport',{headers:{"Authorization":token}})
+            .then((response) =>{
+                if(response.status === 200){
+                    // the backend is essentialy sending a doenload link
+                    // which is we open in browser srtars downloading
+                    var a = document.createElement('a');
+                    a.href= response.data.fileURL;
+                    a.download = 'myexpense.csv';
+                    a.click();
+
+                }else{
+                    throw new Error(response.data.message)
+                }
+            })
+            .catch((err)=>
+                showError(err)
+            )
+    }catch(err){
+        console.log(err);
+    }
+}
+
 document.addEventListener('DOMContentLoaded',async ()=>{
     
     try{
@@ -95,6 +124,8 @@ document.addEventListener('DOMContentLoaded',async ()=>{
             document.getElementById("rzp-button1").style.visibility = "hidden";
             document.getElementById("message").removeAttribute("hidden");
             document.getElementById("leaderboard").removeAttribute("hidden");
+            document.getElementById("downloadreport").removeAttribute("hidden");
+
         }
         for(let i=0;i<oldDatalist.data.response.length;i++){
             addToTable(oldDatalist.data.response[i]);
