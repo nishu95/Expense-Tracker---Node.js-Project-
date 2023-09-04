@@ -25,6 +25,8 @@ exports.expenseGet = async (req, res, next) => {
     try{
         const page = parseInt(req.query.page);
         console.log("page: " + page)
+        const rows = parseInt(req.query.rows);
+        console.log("rows: " + rows)
         
         // console.log("user is >>>",req.user);
         const ispremium= req.user.ispremiumuser;
@@ -37,19 +39,20 @@ exports.expenseGet = async (req, res, next) => {
         const response = await expenseDataTable.findAll(
             {
                 where: {userId: req.user.id},
-                offset: (page-1) * ITEMS_PER_PAGE,
-                limit: ITEMS_PER_PAGE
+                offset: (page-1) * rows,
+                limit: rows
             });
         console.log("response generated in getexpense controller >>>>",response);
         res.status(200).json({
             expenses:response,
+            rows:rows,
             success:true,
             premiumStatus: ispremium,
             currentPage:page,
             nextPage: page + 1,
             previousPage: page - 1,
-            lastPage:Math.ceil(totalExpenses/ITEMS_PER_PAGE),
-            hasNextPage:ITEMS_PER_PAGE * page < totalExpenses,
+            lastPage:Math.ceil(totalExpenses/rows),
+            hasNextPage:rows * page < totalExpenses,
             hasPreviousPage: page > 1
         });
     }catch(err){

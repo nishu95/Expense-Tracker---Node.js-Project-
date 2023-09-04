@@ -65,6 +65,17 @@
             </div>
         </div>
     </div>
+    <div id="rowsperpagediv" class="container">
+        <label for="rowsPerPage">Rows per Page:</label>
+        <select id="rowsPerPage">
+            <option value="">NULL</option>
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+        </select>
+    </div>
     <div class="container">
         <h2>EXPENSE</h2>
         <table class="table" id="table">
@@ -83,7 +94,7 @@
         </table>
     </div>
     
-    <div class="align-items-center" id="container"></div>
+    <div class="container" id="container"></div>
 
     <div class="container" id="leader" > 
         <p id="p" hidden><strong>Leader Board</strong></p>     

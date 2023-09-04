@@ -8,6 +8,7 @@ const download = document.getElementById('downloadreport');;
 download.addEventListener('click',DownloadReport)
 const token = localStorage.getItem('token');
 const pagination = document.getElementById('container');
+const rowsPerPage = document.getElementById('rowsPerPage');
 
 
 
@@ -139,9 +140,17 @@ async function DownloadReport(e){
     
 // });
 
-async function getExpenses(page){
+rowsPerPage.addEventListener('change', (e)=>{
+    const new_no_of_rows = e.target.value; 
+    console.log("new_no_of_rows are >>>>>",new_no_of_rows);
+    localStorage.setItem("rows",new_no_of_rows);
+    rowsPerPage.value = new_no_of_rows;
+    window.location.reload();
+})
+
+async function getExpenses(page,rows){
     try{
-        await axios.get(`http://localhost:7300/expense?page=${page}`,{headers:{"Authorization":token}})
+        await axios.get(`http://localhost:7300/expense?page=${page}&rows=${rows}`,{headers:{"Authorization":token}})
             .then(({data:{expenses , ...pageData}}) => {
                 console.log("expense response inside getExpense function >>>>",expenses,"pageData response inside getExpense function >>>>",pageData);
                 document.getElementById('tbody').innerHTML ="";
@@ -157,25 +166,25 @@ async function getExpenses(page){
 
 function showPagination(pageData){
     pagination.innerHTML = '';
-    console.log("showPagination function parameters >>>>> ",pageData.currentPage,pageData.nextPage,pageData.previousPage,pageData.lastPage,pageData.hasNextPage,pageData.hasPreviousPage)
+    console.log("showPagination function parameters >>>>> ",pageData.rows,pageData.currentPage,pageData.nextPage,pageData.previousPage,pageData.lastPage,pageData.hasNextPage,pageData.hasPreviousPage)
     
 
     if(pageData.hasPreviousPage){
         const btn2 = document.createElement('button');
         btn2.innerHTML = pageData.previousPage;
-        btn2.addEventListener('click',()=> getExpenses(pageData.previousPage));
+        btn2.addEventListener('click',()=> getExpenses(pageData.previousPage,pageData.rows));
         pagination.appendChild(btn2);
     }
 
     const btn1 = document.createElement('button');
     btn1.innerHTML = `<h3>${pageData.currentPage}</h3>`;
-    btn1.addEventListener('click',()=> getExpenses(pageData.currentPage));
+    btn1.addEventListener('click',()=> getExpenses(pageData.currentPage,pageData.rows));
     pagination.appendChild(btn1);
 
     if(pageData.hasNextPage){
         const btn3 = document.createElement('button');
         btn3.innerHTML = pageData.nextPage;
-        btn3.addEventListener('click',()=> getExpenses(pageData.nextPage));
+        btn3.addEventListener('click',()=> getExpenses(pageData.nextPage,pageData.rows));
         pagination.appendChild(btn3);
     }
 }
@@ -184,7 +193,8 @@ document.addEventListener('DOMContentLoaded',async ()=>{
     try{
         const objUrlParams = new URLSearchParams(window.location.search);
         const page = objUrlParams.get('page') || 1;
-        await axios.get(`http://localhost:7300/expense?page=${page}`,{headers:{"Authorization":token}})
+        const rowsPerPage = localStorage.getItem('rows') || 5;
+        await axios.get(`http://localhost:7300/expense?page=${page}&rows=${rowsPerPage}`,{headers:{"Authorization":token}})
         .then(({data:{expenses , ...pageData}}) => {
             console.log("expense response inside DOMContentLoaded function >>>>",expenses,"pageData response inside DOMContentLoaded function",pageData);
             for(var i=0; i<expenses.length; i++){
@@ -202,9 +212,6 @@ document.addEventListener('DOMContentLoaded',async ()=>{
 
     }catch(err){console.log(err);}   
 });
-
-
-
 
 
 document.getElementById("rzp-button1").onclick = async function(e){
