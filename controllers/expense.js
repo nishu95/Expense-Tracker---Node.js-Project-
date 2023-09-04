@@ -2,16 +2,56 @@ const expenseDataTable = require('../models/expense');
 const UserDataTable=require('../models/user');
 const sequelize = require('../util/database');
 
+// exports.expenseGet = async (req, res, next) => {
+//     console.log("inside get expense controller")
+//     try{
+//         // console.log("user is >>>",req.user);
+//         const ispremium= req.user.ispremiumuser;
+//         // console.log("is user premuium? >>>",ispremium);
+//         // we can also use this
+//         // const response = await req.user.getExpenses();
+//         const response = await expenseDataTable.findAll({where: {userId: req.user.id}});
+//         res.status(200).json({response , success:true , premiumStatus: ispremium});
+//     }catch(err){
+//         console.log(err)
+//         res.status(500).json({success:false});
+//     }
+// }
+
+const ITEMS_PER_PAGE = 5
+
 exports.expenseGet = async (req, res, next) => {
     console.log("inside get expense controller")
     try{
+        const page = parseInt(req.query.page);
+        console.log("page: " + page)
+        
         // console.log("user is >>>",req.user);
         const ispremium= req.user.ispremiumuser;
         // console.log("is user premuium? >>>",ispremium);
         // we can also use this
         // const response = await req.user.getExpenses();
-        const response = await expenseDataTable.findAll({where: {userId: req.user.id}});
-        res.status(200).json({response , success:true , premiumStatus: ispremium});
+        const totalExpenses = await expenseDataTable.count({where: {userId: req.user.id}});
+        console.log("counting of expenses is >>> ", totalExpenses);
+
+        const response = await expenseDataTable.findAll(
+            {
+                where: {userId: req.user.id},
+                offset: (page-1) * ITEMS_PER_PAGE,
+                limit: ITEMS_PER_PAGE
+            });
+        console.log("response generated in getexpense controller >>>>",response);
+        res.status(200).json({
+            expenses:response,
+            success:true,
+            premiumStatus: ispremium,
+            currentPage:page,
+            nextPage: page + 1,
+            previousPage: page - 1,
+            lastPage:Math.ceil(totalExpenses/ITEMS_PER_PAGE),
+            hasNextPage:ITEMS_PER_PAGE * page < totalExpenses,
+            hasPreviousPage: page > 1
+        });
     }catch(err){
         console.log(err)
         res.status(500).json({success:false});

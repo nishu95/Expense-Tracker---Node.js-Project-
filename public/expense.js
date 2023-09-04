@@ -7,6 +7,7 @@ leaderboardButton.addEventListener('click',showLeaderboardTable);
 const download = document.getElementById('downloadreport');;
 download.addEventListener('click',DownloadReport)
 const token = localStorage.getItem('token');
+const pagination = document.getElementById('container');
 
 
 
@@ -28,6 +29,7 @@ async function addexpense(e){
 }
 
 function addToTable(data){
+    const tbody = document.getElementById('tbody')
     const tr = document.createElement('tr');
     tr.id=data.id;
     const t1 = document.createElement('td');
@@ -43,7 +45,7 @@ function addToTable(data){
     tr.appendChild(t2);
     tr.appendChild(t3);
     tr.appendChild(t4);
-    table.appendChild(tr);
+    tbody.appendChild(tr);
 }
 
 function addToTable2(data){
@@ -70,7 +72,8 @@ async function change(e){
         try{
             await axios.delete(`http://localhost:7300/delete/${userId}`,{headers:{"Authorization":token}});
             table.removeChild(tr);
-            document.location.reload();
+            window.location.reload();
+            
         }catch(err){console.log(err)}
     }
 }
@@ -115,25 +118,94 @@ async function DownloadReport(e){
     }
 }
 
-document.addEventListener('DOMContentLoaded',async ()=>{
+// document.addEventListener('DOMContentLoaded',async ()=>{
     
-    try{
-        const oldDatalist = await axios.get('http://localhost:7300/expense',{headers:{"Authorization":token}});
-        console.log("inside refresh",oldDatalist);
-        if(oldDatalist.data.premiumStatus){
-            document.getElementById("rzp-button1").style.visibility = "hidden";
-            document.getElementById("message").removeAttribute("hidden");
-            document.getElementById("leaderboard").removeAttribute("hidden");
-            document.getElementById("downloadreport").removeAttribute("hidden");
+//     try{
+//         const oldDatalist = await axios.get('http://localhost:7300/expense',{headers:{"Authorization":token}});
+//         console.log("inside refresh",oldDatalist);
+//         if(oldDatalist.data.premiumStatus){
+//             document.getElementById("rzp-button1").style.visibility = "hidden";
+//             document.getElementById("message").removeAttribute("hidden");
+//             document.getElementById("leaderboard").removeAttribute("hidden");
+//             document.getElementById("downloadreport").removeAttribute("hidden");
+//         }
 
-        }
-        for(let i=0;i<oldDatalist.data.response.length;i++){
-            addToTable(oldDatalist.data.response[i]);
-        }
-    }
-    catch(err){console.log(err);}
+//         for(let i=0;i<oldDatalist.data.response.length;i++){
+//             addToTable(oldDatalist.data.response[i]);
+//         }
+
+//     }
+//     catch(err){console.log(err);}
     
+// });
+
+async function getExpenses(page){
+    try{
+        await axios.get(`http://localhost:7300/expense?page=${page}`,{headers:{"Authorization":token}})
+            .then(({data:{expenses , ...pageData}}) => {
+                console.log("expense response inside getExpense function >>>>",expenses,"pageData response inside getExpense function >>>>",pageData);
+                document.getElementById('tbody').innerHTML ="";
+                for(var i=0; i<expenses.length; i++){
+                    addToTable(expenses[i]);
+                }
+                showPagination(pageData)    
+            })
+            .catch(err => {throw new Error(err)})
+
+    }catch(err){console.log(err);}
+}
+
+function showPagination(pageData){
+    pagination.innerHTML = '';
+    console.log("showPagination function parameters >>>>> ",pageData.currentPage,pageData.nextPage,pageData.previousPage,pageData.lastPage,pageData.hasNextPage,pageData.hasPreviousPage)
+    
+
+    if(pageData.hasPreviousPage){
+        const btn2 = document.createElement('button');
+        btn2.innerHTML = pageData.previousPage;
+        btn2.addEventListener('click',()=> getExpenses(pageData.previousPage));
+        pagination.appendChild(btn2);
+    }
+
+    const btn1 = document.createElement('button');
+    btn1.innerHTML = `<h3>${pageData.currentPage}</h3>`;
+    btn1.addEventListener('click',()=> getExpenses(pageData.currentPage));
+    pagination.appendChild(btn1);
+
+    if(pageData.hasNextPage){
+        const btn3 = document.createElement('button');
+        btn3.innerHTML = pageData.nextPage;
+        btn3.addEventListener('click',()=> getExpenses(pageData.nextPage));
+        pagination.appendChild(btn3);
+    }
+}
+
+document.addEventListener('DOMContentLoaded',async ()=>{
+    try{
+        const objUrlParams = new URLSearchParams(window.location.search);
+        const page = objUrlParams.get('page') || 1;
+        await axios.get(`http://localhost:7300/expense?page=${page}`,{headers:{"Authorization":token}})
+        .then(({data:{expenses , ...pageData}}) => {
+            console.log("expense response inside DOMContentLoaded function >>>>",expenses,"pageData response inside DOMContentLoaded function",pageData);
+            for(var i=0; i<expenses.length; i++){
+                addToTable(expenses[i]);
+            }
+            if(pageData.premiumStatus){
+                document.getElementById("rzp-button1").style.visibility = "hidden";
+                document.getElementById("message").removeAttribute("hidden");
+                document.getElementById("leaderboard").removeAttribute("hidden");
+                document.getElementById("downloadreport").removeAttribute("hidden");
+            }
+            showPagination(pageData)
+        })
+        .catch((err) => {throw new Error(err)})
+
+    }catch(err){console.log(err);}   
 });
+
+
+
+
 
 document.getElementById("rzp-button1").onclick = async function(e){
     
